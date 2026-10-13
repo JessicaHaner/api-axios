@@ -1,28 +1,285 @@
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-
-    <!-- Bootstrap -->
     <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
-
-    <!-- Toastify -->
     <link rel="stylesheet" href="./node_modules/toastify/dist/toastify.css">
+    <link rel="stylesheet" href="./style.css">
 </head>
+
+
 <body>
-    
-    <!-- Axios -->
+    <div class="app-layout">
+
+        <!-- Menu lateral -->
+        <aside class="sidebar">
+            <a href="#" class="brand">
+                <span class="brand-icon">
+                    <i class="bi bi-grid-1x2-fill"></i>
+                </span>
+                AdminFlow
+            </a>
+
+            <p class="menu-label">MENU PRINCIPAL</p>
+
+            <nav aria-label="Navegação principal">
+                <button
+                    class="nav-link-custom active"
+                    data-section="users"
+                    type="button"
+                >
+                    <i class="bi bi-people"></i>
+                    Usuários
+                </button>
+
+                <button
+                    class="nav-link-custom"
+                    data-section="products"
+                    type="button"
+                >
+                    <i class="bi bi-box-seam"></i>
+                    Produtos
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-dot"></div>
+                <span>API REST</span>
+                <span class="status-text">Conexão configurável</span>
+            </div>
+        </aside>
+
+        <!-- Conteúdo principal -->
+        <main class="main-content">
+
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">PAINEL ADMINISTRATIVO</p>
+                    <h1 id="page-title">Usuários</h1>
+                </div>
+
+                <button
+                    class="btn btn-primary-custom"
+                    id="btn-new"
+                    type="button"
+                >
+                    <i class="bi bi-plus-lg me-2"></i>
+                    Novo usuário
+                </button>
+            </header>
+
+            <!-- Indicadores -->
+            <section class="stats-grid" aria-label="Resumo dos registros">
+                <article class="stat-card">
+                    <div class="stat-icon users-icon">
+                        <i class="bi bi-people"></i>
+                    </div>
+                    <div>
+                        <p>Total de usuários</p>
+                        <h2 id="total-users">—</h2>
+                    </div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-icon products-icon">
+                        <i class="bi bi-box-seam"></i>
+                    </div>
+                    <div>
+                        <p>Total de produtos</p>
+                        <h2 id="total-products">—</h2>
+                    </div>
+                </article>
+
+                <article class="stat-card">
+                    <div class="stat-icon value-icon">
+                        <i class="bi bi-currency-dollar"></i>
+                    </div>
+                    <div>
+                        <p>Valor do estoque</p>
+                        <h2 id="total-value">—</h2>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Listagem -->
+            <section class="content-card">
+                <div class="content-heading">
+                    <div>
+                        <h2 id="table-title">Todos os usuários</h2>
+                        <p id="table-description">
+                            Gerencie os usuários cadastrados no sistema.
+                        </p>
+                    </div>
+
+                    <button
+                        class="btn btn-outline-secondary btn-sm"
+                        id="btn-refresh"
+                        type="button"
+                    >
+                        <i class="bi bi-arrow-clockwise me-1"></i>
+                        Atualizar
+                    </button>
+                </div>
+
+                <div class="toolbar">
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input
+                            type="search"
+                            class="form-control"
+                            id="search-input"
+                            placeholder="Buscar usuários..."
+                            aria-label="Pesquisar registros"
+                        >
+                    </div>
+
+                    <span class="record-count" id="record-count">
+                        Carregando...
+                    </span>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table align-middle">
+                        <thead id="table-head"></thead>
+                        <tbody id="table-body">
+                            <tr>
+                                <td class="text-center py-5" colspan="3">
+                                    <div
+                                        class="spinner-border spinner-border-sm text-primary"
+                                        role="status"
+                                    >
+                                        <span class="visually-hidden">
+                                            Carregando...
+                                        </span>
+                                    </div>
+                                    <span class="ms-2">Carregando registros...</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-footer">
+                    <span id="table-footer-text">
+                        Conectando à API...
+                    </span>
+                </div>
+            </section>
+
+            <footer class="page-footer">
+                AdminFlow · Projeto didático de CRUD com JavaScript e Axios
+            </footer>
+        </main>
+    </div>
+
+    <!-- Modal de cadastro e edição -->
+    <div
+        class="modal fade"
+        id="record-modal"
+        tabindex="-1"
+        aria-labelledby="modal-title"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form id="record-form">
+                    <div class="modal-header">
+                        <div>
+                            <p class="eyebrow">GERENCIAMENTO</p>
+                            <h2 class="modal-title fs-5" id="modal-title">
+                                Novo usuário
+                            </h2>
+                        </div>
+
+                        <button
+                            type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Fechar"
+                        ></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div id="form-fields"></div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-light"
+                            data-bs-dismiss="modal"
+                        >
+                            Cancelar
+                        </button>
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary-custom"
+                            id="btn-save"
+                        >
+                            <i class="bi bi-check2 me-1"></i>
+                            Salvar registro
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmação -->
+    <div
+        class="modal fade"
+        id="confirm-modal"
+        tabindex="-1"
+        aria-labelledby="confirm-title"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content">
+                <div class="modal-body text-center p-4">
+                    <div class="delete-icon mb-3">
+                        <i class="bi bi-trash3"></i>
+                    </div>
+
+                    <h2 class="fs-5" id="confirm-title">
+                        Excluir registro?
+                    </h2>
+
+                    <p class="text-secondary small" id="confirm-message">
+                        Esta ação não poderá ser desfeita.
+                    </p>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button
+                            class="btn btn-light flex-fill"
+                            type="button"
+                            data-bs-dismiss="modal"
+                        >
+                            Cancelar
+                        </button>
+
+                        <button
+                            class="btn btn-danger flex-fill"
+                            id="btn-confirm-delete"
+                            type="button"
+                        >
+                            Excluir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bibliotecas -->
     <script src="./node_modules/axios/dist/axios.min.js"></script>
-
-    <!-- Bootstrap JS -->
     <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- Toastify JS -->
     <script src="./node_modules/toastify/dist/build.js"></script>
 
-    <!-- JSON Server não é importado no HTML; deve ser executado via terminal/CLI -->
-    <!-- Exemplo: npx json-server --watch db.json -->
+    <!-- Lógica da aplicação -->
+    <script src="./app.js"></script>
 </body>
 </html>
