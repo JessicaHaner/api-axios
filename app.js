@@ -31,16 +31,27 @@ function render() {
         ? "Gerencie os usuários cadastrados no sistema."
         : "Gerencie os produtos cadastrados no sistema.";
 }
+
 // Mostra os registros na tabela
-function renderRowns() {
-    $("#table-body").innerHTML = records.map((record) => `
-        <tr>
-            <td>${record.id}</td>
-            <td>${record.name}</td>
-            <td>${record.email}</td>
-        </tr>
-    `).join("");
-        
+function renderRows() {
+    if (isUsersPage()) {
+        $("#table-body").innerHTML = records.map((record) => `
+            <tr>
+                <td>${record.id}</td>
+                <td>${record.name}</td>
+                <td>${record.email}</td>
+            </tr>
+        `).join("");
+    } else {
+        $("#table-body").innerHTML = records.map((record) => `
+            <tr>
+                <td>${record.id}</td>
+                <td>${record.name}</td>
+                <td>R$ ${record.price.toFixed(2)}</td>
+                <td>Ações</td>
+            </tr>
+        `).join("");
+    }
 }
 
     // Busca os registros na API
@@ -62,7 +73,7 @@ async function carregar() {
     records = await listar();
 
     console.log("Registros armazenados:", records);
-    renderRowns();
+    renderRows();
 }
 
 // Inicializa a página
@@ -72,3 +83,14 @@ async function iniciar() {
 }
 
 iniciar();
+
+// Controla a navegação entre as seções
+document.querySelectorAll("[data-section]").forEach((button) => {
+    button.addEventListener("click", async () => {
+        section = button.dataset.section;
+
+        render();
+        await carregar();
+    });
+});
+
